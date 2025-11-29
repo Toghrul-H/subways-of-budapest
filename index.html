@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Subways of Budapest – Core Edition</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Toasts -->
+  <div class="toast-container" data-toast></div>
+
+  <!-- MENU SCREEN -->
+  <div class="screen" data-screen="menu">
+    <div class="menu-panel">
+      <h1>Subways of Budapest</h1>
+      <p class="subtitle">Build neon metro lines across Buda and Pest.</p>
+
+
+      <div class="input-row">
+        <input id="playerName" type="text" placeholder="Enter your name…" />
+        <button class="btn" data-action="start">Start Game</button>
+      </div>
+
+      <details class="rules">
+        <summary>Game Rules</summary>
+        <ul>
+          <li>4 rounds (M1–M4, random order)</li>
+          <li>8 cards per round (A–D + Jokers)</li>
+          <li>Start from your line's start station, connect valid pairs</li>
+          <li>Segments must be straight or 45° diagonal</li>
+          <li>No intersections or loops</li>
+        </ul>
+      </details>
+
+      <!-- High Scores Section -->
+      <section>
+        <h2 style="margin-top:1.5rem; margin-bottom:0.5rem;">High Scores</h2>
+        <ul data-highscores class="scores"></ul>
+      </section>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen hidden" data-screen="game">
+    <!-- HUD -->
+    <header class="hud">
+      <!-- Top row: Player + Timer -->
+      <div class="hud-row hud-row-top">
+        <div class="pill">
+          👤 <span data-hud="player"></span>
+        </div>
+        <div class="pill">
+          ⏱ <span data-hud="timer">00:00</span>
+        </div>
+      </div>
+
+      <!-- Bottom row: line, card, counters -->
+      <div class="hud-row hud-row-bottom">
+        <div class="pill line-pill">
+          <span class="dot" data-hud="line-dot"></span>
+          <span data-hud="line-name">M1</span>
+        </div>
+
+        <div class="pill">
+          Card:
+          <span class="card-face" data-hud="card">–</span>
+          <span style="margin-left:0.5rem; font-size:0.85rem;">
+            <span data-hud="card-type">–</span>
+          </span>
+        </div>
+
+        <div class="pill">
+          Cards:
+          <span data-hud="cards">0 / 8</span>
+        </div>
+
+        <div class="pill" style="font-size:0.8rem;">
+          Types:
+          <span data-hud="type-counts">Side 0 · Center 0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- BOARD + SIDEBAR -->
+    <main class="layout">
+      <section class="board" data-board>
+        <div class="layer layer-grid"></div>
+        <div class="layer layer-segments" data-layer="segments"></div>
+        <div class="layer layer-stations" data-layer="stations"></div>
+      </section>
+
+      <aside class="sidebar">
+        <h2>Controls</h2>
+        <div class="control-buttons">
+          <button class="btn" data-action="draw">Draw</button>
+          <button class="btn" data-action="skip">Skip</button>
+          <button class="btn" data-action="undo">Undo</button>
+          <!-- NEW: End Round button -->
+          <button class="btn" data-action="end-round" disabled>End Round</button>
+        </div>
+
+        <h2>Round Scores</h2>
+        <ul class="scores" data-scores></ul>
+        <div class="final" data-final>Final Score: –</div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Station template -->
+  <template id="tpl-station">
+    <button class="station">
+      <span class="station-ring"></span>
+      <span class="station-mark" data-mark></span>
+    </button>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
