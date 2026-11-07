@@ -1,177 +1,83 @@
-🚇 Subways of Budapest – Core Edition (Extended)
+# Subways of Budapest
 
-Subways of Budapest is an extended, browser-based strategy game inspired by Next Station: London.
-You build neon metro lines across Budapest, following strict placement rules, card mechanics, scoring logic, and advanced constraints such as switch cards, center/side card balancing, and round-locking.
+Build a metro network across Buda and Pest. Draw cards, connect stations on a 10 × 10 grid, and plan four routes across the Danube. Subways of Budapest is an independent educational implementation inspired by the board game *Next Station: London*. The project has no official affiliation with the original game.
 
-This version includes a fully rewritten rendering system, polished UI/UX, and full support for real-time scoring, localStorage-based high scores, and geometric validation.
+![The Subways of Budapest departure screen](docs/screenshots/release-menu.png)
 
-🧩 Game Overview
+[Game board](docs/screenshots/release-game.png) · [Multiple lines](docs/screenshots/release-multi-line.png) · [Mobile gameplay](docs/screenshots/release-mobile-game.png) · [Results](docs/screenshots/release-results.png) · [Screenshot gallery](docs/screenshots/README.md)
 
-You play four rounds — one for each Budapest metro line (M1–M4).
-Each round:
+<details>
+<summary>Watch the gameplay demo</summary>
 
-You draw 8 cards (A–D letters, Jokers, Switch)
+![A real browser recording showing Switch activation and two M1 segments being placed](docs/screenshots/gameplay.gif)
 
-You extend your metro line from the active endpoint
+</details>
 
-Segments must be:
+## Features
 
-straight or 45° diagonal
+- 53 stations and four metro lines with distinct colors and starting points.
+- Card-driven construction with letter, Joker and Switch cards, plus highlighted legal destinations.
+- Grid-based route checks for crossings, overlaps, intermediate stations, reused segments and loops.
+- Undo, confirmed restart or return to menu, and a final report with line scores, bonuses and elapsed time.
+- Responsive layout with native keyboard controls, touch interaction and reduced-motion support.
+- Browser-local high scores. The game runs without a backend or runtime npm packages.
 
-not intersecting other segments
+## Run locally
 
-not passing through stations
+Start a static HTTP server from the project root with Python 3:
 
-not overlapping previous lines
+```sh
+python -m http.server 8000 --bind 127.0.0.1
+```
 
-not forming loops
+Open [the local game](http://127.0.0.1:8000/). Station and line data are fetched over HTTP. The browser needs JavaScript modules and local storage for saving scores. Node.js is only needed for tests.
 
-You gain points based on:
+## Play
 
-District diversity (PK)
+1. Enter your name and choose **Start game**. The four lines are played in a shuffled order, one per round.
+2. Choose **Draw**. Select the active endpoint, then a highlighted destination. A letter card matches its letter or a wildcard station. A Joker matches any station.
+3. Draw horizontal, vertical or 45° segments. Different lines may share a station. A segment cannot cross or overlap another segment, pass through an intermediate station, reuse a station pair or revisit a station on the current line.
+4. A **Switch** is counted as a center card and draws a replacement. It allows one branch from a station visited by the current line. **Skip** consumes the current card. **Undo** removes the latest segment on the current line and restores its previous endpoint. The card remains spent.
+5. A round can end after eight used cards. Once five cards of one type have appeared, **Draw** and **Skip** lock and **End round** becomes available. After the fourth round, review your report and choose **Play again** or **Main menu**.
 
-Most common district (PM)
+Use the mouse, touch, or **Tab** and **Enter**/**Space** to activate controls. **Escape** cancels a restart or leave confirmation.
 
-Buda ↔ Pest crossings (PD)
+### Scoring
 
-Final bonuses for shared stations across multiple lines
+Each round scores the number of districts reached multiplied by the largest number of visited stations in any one district, plus one point per Buda–Pest crossing. An empty route scores zero. The final report adds a rail-station bonus from a lookup table and a bonus of 2, 5 or 9 points for each station shared by two, three or four lines, respectively. Scores are stored in the current browser and origin.
 
-Special points from train stations
+## Architecture
 
-Everything follows the authentic scoring model of the tabletop original.
+| File or directory | Responsibility |
+| --- | --- |
+| `index.html`, `style.css` | Screen layout, inline map illustration, responsive board and visual feedback |
+| `script.js` | Session lifecycle, cards, rounds, DOM rendering and local persistence |
+| `rules.mjs` | Pure route validation, geometry and scoring |
+| `stations.json`, `lines.json` | Original station coordinates, line colors and starts |
+| `stations-min.json` | Preserved coursework data |
+| `tests/` | Node.js rules tests and Playwright browser checks |
+| `docs/` | Authentic captures and development record |
 
-✨ Extended Features (Beyond Core Rules)
+## Test
 
-This version implements several advanced mechanics:
+Use Node.js 24 and npm:
 
-1. Side / Center Card Types
+```sh
+npm ci
+npm run check
+npm test
+npx playwright install chromium
+npm run test:browser
+```
 
-Each card has a cardType:
+The browser runner serves the app under a repository-style subpath. It covers route construction, undo, round locking, scoring, replay, restart, menu navigation and storage, and checks seven viewport widths. GitHub Actions runs the same checks with Chromium on Linux.
 
-side
+## Static hosting
 
-center
+GitHub Pages can serve the project directly from `main` at the repository root. All game assets are relative to the page or module. See [GitHub's publishing-source instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
-The HUD counts them:
+## Limitations and future work
 
-Side X · Center Y
+The board is a schematic and stations occupy fixed grid cells. Small touch targets are tied to that grid, and high scores stay in one browser. Future work could add keyboard spatial navigation and a zoom mode for narrow screens. See the [development record](docs/CODEX_PROGRESS.md) for test coverage and limitations.
 
-
-If 5 cards of the same type appear → round is locked until the player clicks End Round.
-
-2. SWITCH Card
-
-A special card that:
-
-enables branching from any visited station
-
-acts as a center card for type-counting
-
-instantly auto-draws the next real card
-
-expires immediately after one segment
-
-3. Real Geometry Collision Detection
-
-The system prevents illegal moves:
-
-crossing another segment
-
-passing through stations
-
-reusing the same segment between stations
-
-revisiting a station on the same line (loop rule)
-
-All geometry is calculated using low-level line intersection formulas.
-
-4. LocalStorage High Scores
-
-Scores are saved automatically:
-
-[
-  { "name": "Player1", "score": 143, "time": 295 },
-  ...
-]
-
-
-Displayed in the menu, with sorting.
-
-🗂️ Project Structure
-SubwaysOfBudapest/
-│
-├── index.html        # UI layout + screens (menu + game)
-├── style.css         # Full neon UI theme, grid board styling
-├── script.js         # Game logic (1500+ lines)
-│
-├── stations.json     # Station coordinates, types, sides, districts
-├── lines.json        # M1–M4 metadata (color, start id)
-│
-└── README.md
-
-🎮 How to Play
-
-Open index.html in your browser
-
-Enter your player name
-
-Press Start Game
-
-Draw cards and extend your line following constraints
-
-Use:
-
-Draw
-
-Skip
-
-Undo
-
-End Round (if round locked)
-
-Continue for all 4 lines
-
-View final score + saved highscores
-
-No installation required.
-Runs on Chrome, Firefox, Edge, Safari.
-
-🧠 Core Logic Implemented
-Rendering
-
-CSS Grid station layout
-
-Dynamic line blending (multi-line stations)
-
-Segment drawing via DOM transforms
-
-Neon effects, highlights, pulses, glows
-
-Gameplay Engine
-
-State machine for rounds, lines, cards
-
-Geometry validation (intersections, overlaps, path correctness)
-
-Switch card logic
-
-Segment tracking + endpoint updates
-
-Full undo system
-
-Scoring System
-
-Implements PK, PM, PD, train scoring, and final combo bonuses.
-
-🚀 Technologies Used
-Tech	Use
-HTML5	Structure, template rendering
-CSS3	Dark neon UI, animations, adaptive grid
-JavaScript (Vanilla ES6)	Entire game logic (state machine + rendering + scoring)
-localStorage	High score persistence
-JSON	Station + line data
-👤 Author
-
-Toghrul Hasanli
-Frontend Developer
-toghrulhasanli2@gmail.com
+Developed by [Toghrul Hasanli](https://github.com/Toghrul-H), originally as university coursework. The menu diagram and board decoration are project-specific inline SVGs. The original coursework data is retained. No commercial artwork or external fonts are bundled.

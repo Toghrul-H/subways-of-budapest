@@ -1,0 +1,13 @@
+{
+  "name": "subways-of-budapest",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check script.js && node --check rules.mjs && node --check tests/browser-smoke.cjs",
+    "test": "node --test tests/rules.test.mjs",
+    "test:browser": "node tests/browser-smoke.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

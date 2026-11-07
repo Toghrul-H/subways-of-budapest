@@ -1,120 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Subways of Budapest – Core Edition</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subways of Budapest</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="toast-container" data-toast role="status" aria-live="polite"></div>
 
-  <!-- Toasts -->
-  <div class="toast-container" data-toast></div>
-
-  <!-- MENU SCREEN -->
-  <div class="screen" data-screen="menu">
-    <div class="menu-panel">
-      <h1>Subways of Budapest</h1>
-      <p class="subtitle">Build neon metro lines across Buda and Pest.</p>
-
-
-      <div class="input-row">
-        <input id="playerName" type="text" placeholder="Enter your name…" />
-        <button class="btn" data-action="start">Start Game</button>
-      </div>
-
-      <details class="rules">
-        <summary>Game Rules</summary>
-        <ul>
-          <li>4 rounds (M1–M4, random order)</li>
-          <li>8 cards per round (A–D + Jokers)</li>
-          <li>Start from your line's start station, connect valid pairs</li>
-          <li>Segments must be straight or 45° diagonal</li>
-          <li>No intersections or loops</li>
-        </ul>
-      </details>
-
-      <!-- High Scores Section -->
-      <section>
-        <h2 style="margin-top:1.5rem; margin-bottom:0.5rem;">High Scores</h2>
-        <ul data-highscores class="scores"></ul>
-      </section>
-    </div>
-  </div>
-
-  <!-- GAME SCREEN -->
-  <div class="screen hidden" data-screen="game">
-    <!-- HUD -->
-    <header class="hud">
-      <!-- Top row: Player + Timer -->
-      <div class="hud-row hud-row-top">
-        <div class="pill">
-          👤 <span data-hud="player"></span>
-        </div>
-        <div class="pill">
-          ⏱ <span data-hud="timer">00:00</span>
-        </div>
-      </div>
-
-      <!-- Bottom row: line, card, counters -->
-      <div class="hud-row hud-row-bottom">
-        <div class="pill line-pill">
-          <span class="dot" data-hud="line-dot"></span>
-          <span data-hud="line-name">M1</span>
-        </div>
-
-        <div class="pill">
-          Card:
-          <span class="card-face" data-hud="card">–</span>
-          <span style="margin-left:0.5rem; font-size:0.85rem;">
-            <span data-hud="card-type">–</span>
-          </span>
-        </div>
-
-        <div class="pill">
-          Cards:
-          <span data-hud="cards">0 / 8</span>
-        </div>
-
-        <div class="pill" style="font-size:0.8rem;">
-          Types:
-          <span data-hud="type-counts">Side 0 · Center 0</span>
-        </div>
-      </div>
+  <main class="screen menu-screen" data-screen="menu">
+    <header class="masthead">
+      <span class="wordmark"><span class="metro-icon" aria-hidden="true">M</span> Budapest Metro</span>
+      <span class="masthead-note">Network planning game</span>
     </header>
 
-    <!-- BOARD + SIDEBAR -->
-    <main class="layout">
-      <section class="board" data-board>
-        <div class="layer layer-grid"></div>
-        <div class="layer layer-segments" data-layer="segments"></div>
-        <div class="layer layer-stations" data-layer="stations"></div>
+    <div class="menu-grid">
+      <section class="hero" aria-labelledby="game-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="signal"></span> Buda · Danube · Pest</p>
+          <h1 id="game-title">Subways of<br>Budapest<span>.</span></h1>
+          <p>Draw cards and link stations across the Danube. Plan a network over four rounds, one for each Budapest metro line.</p>
+        </div>
+        <svg class="hero-map" viewBox="0 0 640 260" aria-hidden="true" focusable="false">
+          <defs>
+            <pattern id="map-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+              <path d="M24 0H0V24" fill="none" stroke="#2c455a" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="640" height="260" fill="url(#map-grid)"/>
+          <path d="M326 -16 301 45 319 94 296 143 311 187 273 276" fill="none" stroke="#142e46" stroke-width="55"/>
+          <g fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M64 175H178L240 113H432L490 55H582" stroke="#f2ca4f"/>
+            <path d="M104 66H199L277 144H472L527 199H590" stroke="#f06e72"/>
+            <path d="M418 31V82L387 113V166L446 225H539" stroke="#58a7ea"/>
+            <path d="M72 222H148L194 176H322L354 144H432" stroke="#57c98f"/>
+          </g>
+          <g fill="#101d2b" stroke="#e8eef5" stroke-width="3">
+            <circle cx="64" cy="175" r="6"/><circle cx="178" cy="175" r="6"/><circle cx="240" cy="113" r="6"/>
+            <circle cx="387" cy="113" r="8"/><circle cx="490" cy="55" r="6"/><circle cx="582" cy="55" r="6"/>
+            <circle cx="104" cy="66" r="6"/><circle cx="199" cy="66" r="6"/><circle cx="277" cy="144" r="6"/>
+            <circle cx="354" cy="144" r="8"/><circle cx="472" cy="144" r="6"/><circle cx="590" cy="199" r="6"/>
+            <circle cx="418" cy="31" r="6"/><circle cx="446" cy="225" r="6"/><circle cx="539" cy="225" r="6"/>
+            <circle cx="72" cy="222" r="6"/><circle cx="148" cy="222" r="6"/><circle cx="432" cy="144" r="6"/>
+          </g>
+        </svg>
+        <div class="line-key" aria-label="Metro lines">
+          <span class="line-key-item m1">M1</span><span class="line-key-item m2">M2</span>
+          <span class="line-key-item m3">M3</span><span class="line-key-item m4">M4</span>
+        </div>
       </section>
 
-      <aside class="sidebar">
-        <h2>Controls</h2>
+      <section class="menu-panel" aria-labelledby="start-title">
+        <p class="eyebrow">Departure</p>
+        <h2 id="start-title">Start a new game</h2>
+        <form data-start-form>
+          <label for="playerName">Player name</label>
+          <input id="playerName" type="text" placeholder="Enter your name" autocomplete="nickname" required>
+          <button class="btn primary" type="submit" data-action="start" disabled>Start game <span aria-hidden="true">→</span></button>
+          <p class="load-error hidden" data-load-error role="alert"></p>
+        </form>
+        <details class="rules">
+          <summary>How to play</summary>
+          <ol>
+            <li>Draw a card, then select the active endpoint and a matching station. A Joker matches any station.</li>
+            <li>Draw straight or 45° diagonal segments. Avoid crossings, reused segments, intermediate stations and loops.</li>
+            <li>A Switch allows one branch from a station on your current line. Skip a card if you cannot use it.</li>
+            <li>Play up to eight used cards per line. At five cards of one type, use End Round to move on.</li>
+          </ol>
+        </details>
+        <section class="leaderboard" aria-labelledby="records-title">
+          <p class="eyebrow">Saved in this browser</p>
+          <h2 id="records-title">High scores</h2>
+          <p class="muted" data-empty-scores>No runs recorded yet.</p>
+          <ol data-highscores class="scores"></ol>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <div class="screen game-screen hidden" data-screen="game">
+    <header class="masthead">
+      <span class="wordmark"><span class="metro-icon" aria-hidden="true">M</span> Subways of Budapest</span>
+      <span class="player-meta"><span data-hud="player"></span><time data-hud="timer">00:00</time></span>
+    </header>
+    <main class="layout">
+      <section class="board-shell" aria-labelledby="map-title">
+        <div class="map-heading"><div><p class="eyebrow">Route planning</p><h2 id="map-title">Network map</h2></div>
+          <span class="map-key"><span>Buda</span> <span class="water-key" aria-hidden="true"></span> <span>Pest</span></span>
+        </div>
+        <div class="board" data-board>
+          <svg class="board-water" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path d="M58 -3 56 22 50 40 46 66 48 82 52 103" fill="none" stroke="#193a55" stroke-width="7"/>
+            <path d="M58 -3 56 22 50 40 46 66 48 82 52 103" fill="none" stroke="#255374" stroke-width=".35"/>
+          </svg>
+          <div class="layer layer-grid"></div>
+          <div class="layer layer-segments" data-layer="segments" aria-hidden="true"></div>
+          <div class="layer layer-stations" data-layer="stations" aria-label="Stations"></div>
+        </div>
+        <div class="map-caption"><span><i aria-hidden="true"></i> Active endpoint</span><span><i class="rail-symbol" aria-hidden="true"></i> Rail station</span><span><i class="candidate-symbol" aria-hidden="true"></i> Available destination</span></div>
+      </section>
+      <section class="panel controls" aria-labelledby="controls-title">
+        <div class="hud">
+          <div class="hud-heading">
+            <div><p class="eyebrow" data-hud="round">Round 1 / 4</p><h2 id="controls-title">Active line</h2></div>
+            <div class="line-pill"><span class="dot" data-hud="line-dot"></span><span data-hud="line-name">M1</span></div>
+          </div>
+          <div class="card-slot">
+            <span class="card-face" data-hud="card">–</span>
+            <div><span class="eyebrow">Current card</span><strong data-hud="card-type">–</strong>
+              <span class="switch-status hidden" data-hud="switch">Switch active</span></div>
+          </div>
+          <dl class="counters"><div><dt>Cards used</dt><dd data-hud="cards">0 / 8</dd></div>
+            <div><dt>Card types</dt><dd data-hud="type-counts">Side 0 · Center 0</dd></div></dl>
+        </div>
         <div class="control-buttons">
-          <button class="btn" data-action="draw">Draw</button>
+          <button class="btn primary" data-action="draw">Draw</button>
           <button class="btn" data-action="skip">Skip</button>
           <button class="btn" data-action="undo">Undo</button>
-          <!-- NEW: End Round button -->
-          <button class="btn" data-action="end-round" disabled>End Round</button>
+          <button class="btn" data-action="end-round" disabled>End round</button>
         </div>
-
-        <h2>Round Scores</h2>
+        <p class="turn-guide" data-guide></p>
+      </section>
+      <section class="panel round-scores" aria-labelledby="scores-title">
+        <p class="eyebrow">Service record</p>
+        <h2 id="scores-title">Round scores</h2>
         <ul class="scores" data-scores></ul>
-        <div class="final" data-final>Final Score: –</div>
-      </aside>
+        <p class="final" data-final aria-live="polite">Final Score: –</p>
+        <div class="session-actions">
+          <button class="btn" data-action="restart">Restart</button>
+          <button class="btn" data-action="leave">Main menu</button>
+        </div>
+      </section>
     </main>
   </div>
 
-  <!-- Station template -->
+  <main class="screen results-screen hidden" data-screen="results" aria-labelledby="results-title">
+    <header class="masthead">
+      <span class="wordmark"><span class="metro-icon" aria-hidden="true">M</span> Subways of Budapest</span>
+      <span class="masthead-note">Service report</span>
+    </header>
+    <div class="results-layout">
+      <section class="panel results-hero">
+        <p class="eyebrow"><span class="signal"></span> Four lines completed</p>
+        <h1 id="results-title" tabindex="-1">Network complete</h1>
+        <p class="muted">Planner <strong data-result="player"></strong></p>
+        <dl class="result-total">
+          <div><dt>Total score</dt><dd data-result="total"></dd></div>
+          <div><dt>Play time</dt><dd data-result="time"></dd></div>
+        </dl>
+        <div class="session-actions">
+          <button class="btn primary" data-action="again">Play again</button>
+          <button class="btn" data-action="results-menu">Main menu</button>
+        </div>
+      </section>
+      <section class="panel results-detail" aria-labelledby="breakdown-title">
+        <p class="eyebrow">Score breakdown</p>
+        <h2 id="breakdown-title">Line by line</h2>
+        <ul class="result-lines" data-result="lines"></ul>
+        <dl class="result-bonuses">
+          <div><dt>Round subtotal</dt><dd data-result="round-points"></dd></div>
+          <div><dt>Rail stations</dt><dd data-result="rail-points"></dd></div>
+          <div><dt>Shared stations</dt><dd data-result="transfer-points"></dd></div>
+        </dl>
+      </section>
+    </div>
+  </main>
+
+  <dialog class="panel confirm-dialog" data-confirm aria-labelledby="confirm-title" aria-describedby="confirm-description">
+    <form method="dialog">
+      <p class="eyebrow">Current service</p>
+      <h2 id="confirm-title" data-confirm-title></h2>
+      <p id="confirm-description" class="muted">Your unfinished route will be lost. Completed scores will stay saved.</p>
+      <div class="session-actions">
+        <button class="btn" value="cancel" autofocus>Keep playing</button>
+        <button class="btn primary" value="confirm" data-confirm-action></button>
+      </div>
+    </form>
+  </dialog>
+
   <template id="tpl-station">
-    <button class="station">
-      <span class="station-ring"></span>
-      <span class="station-mark" data-mark></span>
+    <button class="station" type="button">
+      <span class="station-ring" aria-hidden="true"></span>
+      <span class="station-mark" data-mark aria-hidden="true"></span>
     </button>
   </template>
-
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
